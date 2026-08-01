@@ -47,6 +47,27 @@ class ProcessController(BaseController):
             length_function=len,
         )
 
+        return self._split_file_content(
+            file_content=file_content,
+            text_splitter=text_splitter,
+        )
+
+    def process_file_content_token(self, file_content: list, file_id: str,
+                                   chunk_size: int=100, overlap_size: int=20):
+
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+            encoding_name="cl100k_base",
+            chunk_size=chunk_size,
+            chunk_overlap=overlap_size,
+        )
+
+        return self._split_file_content(
+            file_content=file_content,
+            text_splitter=text_splitter,
+        )
+
+    def _split_file_content(self, file_content: list, text_splitter):
+
         file_content_texts = [
             rec.page_content
             for rec in file_content
@@ -57,13 +78,9 @@ class ProcessController(BaseController):
             for rec in file_content
         ]
 
-        chunks = text_splitter.create_documents(
+        return text_splitter.create_documents(
             file_content_texts,
             metadatas=file_content_metadata
         )
 
-        return chunks
-
-
-    
 
